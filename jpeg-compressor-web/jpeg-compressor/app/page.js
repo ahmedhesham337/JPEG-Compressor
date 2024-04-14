@@ -1,5 +1,5 @@
 'use client'
-import styles from "./page.module.css";
+
 import NavBar from "@/components/NavBar";
 import Col from "react-bootstrap/Col";
 import Container from "react-bootstrap/Container";
@@ -7,20 +7,12 @@ import Image from "react-bootstrap/Image";
 import Row from "react-bootstrap/Row";
 import Form from "react-bootstrap/Form";
 import FormGroup from "react-bootstrap/FormGroup";
-import { useState } from "react";
 import Button from "react-bootstrap/Button";
 
+import { useState } from "react";
 import { useEffect } from "react";
 
 import server from "@/utils/server";
-
-async function getData() {
-  let data;
-  await server.get("/default/original").then((res) => {
-    data = res.data
-  });
-  return data;
-}
 
 export default function Home() {
 
