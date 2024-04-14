@@ -103,7 +103,7 @@ def doCompress():
     decoder.save_decompressed_image("{}/{}".format(OUTPUT_FOLDER, randomName))
 
     oldsz = os.path.getsize(path)
-    newsz = os.path.getsize("{}/{}.jpeg".format(OUTPUT_FOLDER, `randomName))
+    newsz = os.path.getsize("{}/{}.jpeg".format(OUTPUT_FOLDER, randomName))
     compr = round((1 - (newsz / oldsz)) * 100, 2)
 
     decompstats = {
