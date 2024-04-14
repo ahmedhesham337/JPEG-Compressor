@@ -17,6 +17,7 @@ class NumpyArrayEncoder(json.JSONEncoder):
         return json.JSONEncoder.default(self, obj)
 
 UPLOAD_FOLDER = "./upload"
+OUTPUT_FOLDER = "./output"
 
 app = Flask(__name__)
 cors = CORS(app)
@@ -27,7 +28,7 @@ def getRandomName():
 
 @app.route("/image/<imageid>", methods=["GET"])
 def returnImage(imageid):
-    path = "./output/{}.jpeg".format(imageid)
+    path = "{}/{}.jpeg".format(OUTPUT_FOLDER, imageid)
     if os.path.exists(path):
         return send_file(path)
     else:
@@ -44,7 +45,7 @@ def returnStats(imageid):
         }
         return jsonify(x)
     
-    path = "./output/{}.json".format(imageid)
+    path = "{}/{}.json".format(OUTPUT_FOLDER, imageid)
     if os.path.exists(path):
         with open(path, "r") as f:
             dat = f.read()
@@ -86,7 +87,7 @@ def doCompress():
         path, blockSize, quantizaionScale, compressionAlgorithm, useDefaultMatrix, downSampleColor
     )
     encoder.compress()
-    encoder.save_compressed_file("./output/{}".format(randomName))
+    encoder.save_compressed_file("{}/{}".format(OUTPUT_FOLDER, randomName))
     compressed = encoder.get_compressed_image()
     comppstats = encoder.get_stats()
 
@@ -99,10 +100,10 @@ def doCompress():
         comppstats["color_downsampled"]
     )
     decoder.decompress()
-    decoder.save_decompressed_image("./output/{}".format(randomName))
+    decoder.save_decompressed_image("{}/{}".format(OUTPUT_FOLDER, randomName))
 
     oldsz = os.path.getsize(path)
-    newsz = os.path.getsize("./output/{}.jpeg".format(randomName))
+    newsz = os.path.getsize("{}/{}.jpeg".format(OUTPUT_FOLDER, `randomName))
     compr = round((1 - (newsz / oldsz)) * 100, 2)
 
     decompstats = {
@@ -114,12 +115,23 @@ def doCompress():
     del comppstats["original_file_name"]
     del comppstats["compressed_blob_size"]
 
-    with open("./output/{}.json".format(randomName), "w") as f:
+    with open("{}/{}.json".format(OUTPUT_FOLDER, randomName), "w") as f:
         f.write(json.dumps(decompstats))
     
-    with open("./output/{}.metadata".format(randomName), "w") as f:
+    with open("{}/{}.metadata".format(OUTPUT_FOLDER, randomName), "w") as f:
         f.write(base64.b64encode(json.dumps(comppstats, cls=NumpyArrayEncoder).encode()).decode())
 
     return randomName
 
-app.run()
+def main():
+    
+    if not os.path.exists(UPLOAD_FOLDER):
+        os.mkdir(UPLOAD_FOLDER)
+    
+    if not os.path.exists(OUTPUT_FOLDER):
+        os.mkdir(OUTPUT_FOLDER)
+    
+    app.run()
+
+if __name__ == "__main__":
+    main()
