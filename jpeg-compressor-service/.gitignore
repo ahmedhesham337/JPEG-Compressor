@@ -1,3 +1,4 @@
 /upload/*
 /output/*
 /__pycache__/
+/test_data/

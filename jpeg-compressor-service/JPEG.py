@@ -37,6 +37,8 @@ class JPEGEncoder:
         if (self.bDownSampleColor):
             tmp_image_data = colorspace.rgb2ycbcr(tmp_image_data)
         
+        image_dct = dct.forward_dct(tmp_image_data, self.block_size, self.block_size)
+
         if (self.bUseDefaultQMtx):
             self.block_size = 8
             self.quantization_matrix = quantization.get_default_quantization_matrix(
@@ -45,9 +47,7 @@ class JPEGEncoder:
             self.quantization_matrix = quantization.get_quantization_matrix(
                 self.quantization_scale, self.block_size, self.block_size)
         
-        image_dct           = dct.forward_dct(tmp_image_data, self.block_size, self.block_size)
         image_dct_quantized = quantization.quantize(image_dct, self.quantization_matrix)
-
         self.trans_shape    = image_dct_quantized.shape
 
         if self.compression_alg == compression.COMPRESSION_ALGORITHMS.ZIP:
